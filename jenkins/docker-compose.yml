@@ -1,0 +1,25 @@
+﻿services:
+  jenkins:
+    image: jenkins-cicd:lts
+    container_name: jenkins
+    restart: unless-stopped
+    user: root
+    ports:
+      - "9090:9090"
+      - "50000:50000"
+    environment:
+      JENKINS_OPTS: --httpPort=9090
+      JAVA_OPTS: -Xmx1024m -Duser.timezone=Asia/Shanghai -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true
+      TZ: Asia/Shanghai
+    volumes:
+      - ./home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      cicd-net:
+        ipv4_address: 172.28.0.20
+        aliases:
+          - jenkins.abc.com
+
+networks:
+  cicd-net:
+    external: true

@@ -1,0 +1,30 @@
+﻿services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: unless-stopped
+    hostname: gitlab.abc.com
+    shm_size: '256m'
+    ports:
+      - "8083:8083"
+      - "2222:22"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.abc.com:8083'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        prometheus_monitoring['enable'] = false
+        puma['worker_processes'] = 2
+        gitlab_rails['time_zone'] = 'Asia/Shanghai'
+    volumes:
+      - ./config:/etc/gitlab
+      - ./logs:/var/log/gitlab
+      - ./data:/var/opt/gitlab
+    networks:
+      cicd-net:
+        ipv4_address: 172.28.0.10
+        aliases:
+          - gitlab.abc.com
+
+networks:
+  cicd-net:
+    external: true

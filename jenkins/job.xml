@@ -1,0 +1,43 @@
+﻿<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <description>Spring Boot CI/CD：拉取代码 - 构建镜像 - 推送 Harbor - 部署容器</description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <authToken><YOUR-TOKEN></authToken>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command><![CDATA[
+set -e
+REPO=http://oauth2:<GITLAB_ACCESS_TOKEN>@gitlab.abc.com:8083/root/springbootdemo.git
+REG=localhost:8080
+PROJ=demo
+IMG=springbootdemo
+TAG=v${BUILD_NUMBER}
+echo "===== 1. 拉取代码 ====="
+rm -rf /tmp/ws && mkdir -p /tmp/ws && cd /tmp/ws
+git clone --depth 1 $REPO .
+ls -l
+echo "===== 2. 构建镜像 ====="
+docker build -t $REG/$PROJ/$IMG:$TAG .
+echo "===== 3. 推送到 Harbor ====="
+echo <HARBOR_PASSWORD> | docker login $REG -u admin --password-stdin
+docker push $REG/$PROJ/$IMG:$TAG
+echo "===== 4. 部署容器 ====="
+docker rm -f demo-run || true
+docker run -d --name demo-run -p 8888:8080 $REG/$PROJ/$IMG:$TAG
+sleep 8
+echo "===== 部署完成：http://localhost:8888/hello ====="
+curl -s http://localhost:8888/hello || true
+]]></command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

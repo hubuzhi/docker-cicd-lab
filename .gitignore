@@ -1,0 +1,12 @@
+# 运行时数据（GitLab/Jenkins/Harbor 会把数据写在这些目录）
+gitlab/data/
+gitlab/logs/
+gitlab/config/
+jenkins/home/
+harbor/harbor/
+harbor/*.tgz
+harbor/*.tar.gz
+
+# 系统
+.DS_Store
+Thumbs.db

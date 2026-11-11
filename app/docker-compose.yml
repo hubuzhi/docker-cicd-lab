@@ -1,0 +1,19 @@
+services:
+  demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: demo:latest
+    container_name: demo-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Shanghai
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/hello"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
